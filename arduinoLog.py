@@ -1,14 +1,22 @@
 import serial, csv, msvcrt
-ser = serial.Serial('COM3',115200) #object to read from serial port. Find COM data via Arduino>>Tools>>Port 
+import matplotlib.pyplot as plt
+
+optoChucK = False
+plotOn = True 
+
+ser = serial.Serial('COM4',115200) #object to read from serial port. Find COM data via Arduino>>Tools>>Port 
 
 print ("Connected to serial port: {}".format(ser.name))
 ser.flushInput()
 print "press any key to break loop"
 
-output = open("output.csv",'wb') #output .csv file 
-wr = csv.writer(output, dialect='excel') 
-wr.writerow(['f1', 'v1', 'f2', 'v2', 'f3', 'v3', 'f4', 'v4', 'a1', 'a2', 'a3']) #header 
-arduinoDataArray = []
+uniqueName = "pulseTesting"
+fullName = uniqueName + "clean.csv"
+cleanCSVfile = open(fullName,'wb') #output .csv file 
+wr = csv.writer(cleanCSVfile, dialect='excel') 
+#wr.writerow(['f1', 'v1', 'f2', 'v2', 'f3', 'v3', 'f4', 'v4', 'a1', 'a2', 'a3']) #header
+wr.writerow(['time', 'bpm', 'ibi']) #header 
+arduinoDataArray = [] 
 
 while True: # always true 
 	ser.reset_input_buffer()
@@ -20,20 +28,8 @@ while True: # always true
 	dataArray = arduinoString.split(',')
 	try: 
 		#print dataArray 
-		arduinoData0 = int(dataArray[0]) 
-		arduinoData1 = int(dataArray[1]) 
-		arduinoData2 = int(dataArray[2]) 
-		arduinoData3 = int(dataArray[3])
-		arduinoData4 = int(dataArray[4]) 
-		arduinoData5 = int(dataArray[5]) 
-		arduinoData6 = int(dataArray[6]) 
-		arduinoData7 = int(dataArray[7])
-		arduinoData8 = int(dataArray[8]) 
-		arduinoData9 = int(dataArray[9]) 
-		arduinoData10 = int(dataArray[10])
-		arduinoDataArray = [arduinoData0,arduinoData1,arduinoData2,arduinoData3,arduinoData4,arduinoData5,arduinoData6,arduinoData7,arduinoData8,arduinoData9,arduinoData10]
-		print arduinoDataArray 
-		
+		dataArray = map(int, dataArray) #convert strings to ints 
+		print dataArray
 	except ValueError, v: 
 		#print "Value Error:", v, arduinoString
 		pass
@@ -41,14 +37,49 @@ while True: # always true
 		#print "Index Error:", e, arduinoString
 		pass
 		
+	wr = csv.writer(cleanCSVfile, dialect='excel')
+	wr.writerow(dataArray) #write array to a .csv row 
+	cleanCSVfile.flush
+
 	if msvcrt.kbhit(): #press any key to break loop
 		break
 	
-	wr = csv.writer(output, dialect='excel')
-	wr.writerow(arduinoDataArray) #write array to a .csv row 
-	output.flush 
-
 ser.close() #exit gracefully 
-output.close()
+cleanCSVfile.close() #complete writing clean data file 
 
+if (optoChucK == True):
+	#must optimize clean, readable .csv file for ChucK by putting all data in one column
+	inFile = csv.reader(open(fullName, "rb"))
+	CKfile = open(uniqueName +'CK.csv', 'w') 
+	print "optimizing file for Chuck..."
+	i = 0
+	for row in inFile:
+		if (i > 0):
+			j = 0
+			while (j < len(row)):
+				newData = row[j] + "\n"
+				CKfile.write(newData)
+				j += 1
+		i += 1
+		
+	CKfile.close()
+	print "files created! Done!"
+	
+if (plotOn == True):
+	time = []
+	bpm = []
 
+	inFile = csv.reader(open(fullName,'r'), delimiter=',')
+	i = 0
+	for row in inFile:
+		if (i > 0): #ignore header 
+			time.append(int(row[0]))
+			bpm.append(int(row[1]))
+		i += 1
+
+	plt.figure("bpm over time")
+	plt.xlabel("time(ms)")
+	plt.ylabel("bpm")
+	plt.ylim(40, 90)
+	plt.plot(time,bpm)
+	plt.show()
