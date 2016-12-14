@@ -31,7 +31,7 @@ for (0 => int i; i < f_osc.cap(); i++){
 }
 
 0.1 => float aGain; //volume 
-FMVoices a_osc[3]; // oscillators for accel
+Saxofony a_osc[3]; // oscillators for accel
 for (0 => int i; i < a_osc.cap(); i++){ 
     a_osc[i] => dac; //connect each to DAC
 } 
@@ -66,7 +66,7 @@ while (true){
     fingerScream(f1, f2, f3, f4);
     accelSwoosh(a1, a2, a3, av1, av2, av3);
     
-    1::ms => now;
+    10::ms => now;
 }
 
 //=======================FUNCTIONS ==================================================

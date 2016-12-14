@@ -126,7 +126,8 @@ void pulse_processing(){
   }
 }
 
-/* USING CODE FROM PULSESENSOR.COM :-)
+/* 
+ USING CODE FROM PULSESENSOR.COM :-)
  KEPT: 
  signal processing algorithm
  
@@ -134,5 +135,4 @@ void pulse_processing(){
  organized and commented 
  got rid of Interupt service routine to be compatible with other programs I was running 
  used milis() to ensure proper timing of BPM and IBI 
- 
 */

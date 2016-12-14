@@ -1,19 +1,27 @@
 int blinkPin = 13;        // pin to blink led at  beat
+int delayVal = 10; 
 //======================SETUP & LOOP==================================================
 void setup(){
   pinMode(blinkPin,OUTPUT);       // pin that will blink to your heartbeat!
   Serial.begin(115200);
   //setup_emg(); 
-  setup_breath();           
+  setup_breath();          
 }
 
 void loop(){
-  //Serial.print(100);        //for spot checking ChucK
-  //Serial.print(",");        //for spot checking ChucK
-  
+  Serial.print(100);        //for spot checking ChucK
+  Serial.print(",");        //for spot checking ChucK
+
+  //-----EMG ------
   //emg_processing(); 
   //Serial.print(",");
-  breath_processing();     //prints boolean of breath inhale(1) exhale(0)
+  
+  //-----BREATH------
+  breath_processing();      //ALWAYS ON run breath-rate signal processing no print 
+  breathBool();             //prints boolean of breath inhale(1) exhale(0)
+  
+  //breathAvg();              //avg of raw data
+  //breathSlope();
   Serial.print(",");
   
   //-----PULSE-----
@@ -26,5 +34,5 @@ void loop(){
   //printOnBeats();         //only print biodata when beat is detected 
   
   Serial.println();
-  delay(40);
+  delay(delayVal);
 }
