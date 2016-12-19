@@ -7,11 +7,17 @@ I’ve separated Insula into two components: biological (v1), and tactile (v2). 
 
 ##Insula V1
 ###Components: 
-Heart-rate monitor: Pulse Sensor
+1. Heart-rate monitor: Pulse Sensor
 
-Electromyogram: MyoWare from Advancier Technologies 
+2. Electromyogram: MyoWare from Advancier Technologies 
 
-Breath Rate Monitor: Our design  
+3. Breath Rate Monitor: Our design  
+
+##Insula V1
+###Components:
+1. Flex Sensor
+
+2. Acclerometer
 
 ##Conclusion: 
 The name Insula comes from the insular cortex of the brain, which is responsible for helping us recognize our own biology. Your insula is what allows you to feel your heartbeat echo through your body when you’re excited, and what makes your feel thirsty after a long run. And that’s why Insula was built: as an avenue to recognize, respond to, and think more creatively and holistically about our own biology.
