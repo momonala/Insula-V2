@@ -6,6 +6,7 @@ const int delayVal = 10;       //up here for convenience
 const int veloArraySize = 5; //length of array to hold velocity over  
 const int accelArraySize = 10; //length of array to avg accel over
 
+bool ChuckOn = true;
 bool gloveOn = true; //turn sensors on/off 
 bool accelOn = true;        
 
@@ -18,9 +19,11 @@ void setup() {
 
 //===============================LOOP=====================================
 void loop() {   
-  Serial.print(100); //can use to check in ChucK
-  Serial.print(",");
-
+  if (ChuckOn = true){
+    Serial.print(100); //can use to check in ChucK
+    Serial.print(",");
+  }
+  
    //-----GLOVE---------------------------
   if (gloveOn == true){
     gloveReading();             //glove processing
@@ -35,11 +38,11 @@ void loop() {
     if (accel.available()){   //wait for new accel data    
       accel.read();
       accelPosition_Vel();      //accel (psuedo) position & velocity data  
-      //printOrientation();     //orientation integer 
+      printOrientation();     //orientation integer 
       //Serial.print("\t");
     }
   } 
   
-  Serial.println();           //new line 
-  delay(delayVal);            //for stability 
+  Serial.println();
+  delay(delayVal);          
 }

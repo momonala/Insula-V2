@@ -114,5 +114,6 @@ void printOrientation(){
     orientation = 4;
     break;
   }
+  Serial.print(",");
   Serial.print(orientation);
 }

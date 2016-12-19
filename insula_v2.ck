@@ -1,5 +1,5 @@
-<<<"\n", "Welcome to Insula. Prepare for a fantasic musical jounrey.", "\n">>>;
-
+<<<"\n","--------------------------------------------------------">>>;
+<<<" Welcome to Insula. Prepare for a fantasic musical jounrey.", "\n", "--------------------------------------------------------", "\n">>>;
 //--------Open Serial Connectopn ----------------------------------------------------
 SerialIO.list() @=> string list[]; // create array of available serial devices
 for (int i; i<list.size(); i++){
@@ -12,63 +12,53 @@ cereal.open(0, SerialIO.B115200, SerialIO.ASCII); //open port [port# from list, 
 //read a few lines, check to see if "100" marker is at right position
 //blackhole if not
 for (0 => int i; i < 5; i++){
-    cereal.onInts(15) => now; //reading of current line 
+    cereal.onInts(16) => now; //reading of current line 
     cereal.getInts() @=>  int line[]; //cast reading to variable 
-    //<<<line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14] >>>;    
+    //<<<line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14], line[15]>>>;    
     if (i == 4 && line[0] != 100){
         <<<"poor data stream... replace shred">>>;       
         SinOsc s => blackhole; 
         1::week => now; 
     }
+    else if (i == 4 && line[0] == 100){
+        <<<"data stream looks dank. lets go!">>>;
+    }
 }
+
+me.dir() + "/soundFiles/" => string path; //for playing sound files 
+SndBuf startup => dac; //startup sound :)
+//path + "E-Mu-Proteus-FX-XtraSlow-C2" + ".wav" => startup.read;
+//0 => startup.pos;
 
 //--------Intialize Oscillators ----------------------------------------------------
-//STKinstruments: Clarinet, BlowBotl, Flute, Saxofony, Brass, ModalBar, BandedWG. Moog
-0.05 => float fGain; //volume 
-SinOsc f_osc[4]; //oscillators for fingers 
-for (0 => int i; i < f_osc.cap(); i++){ 
-    f_osc[i] => dac; //connect each to DAC 
+//STKinstruments: Clarinet, BlowBotl, Flute, Saxofony, Brass, ModalBar, BandedWG, Moog
+//-----FINGERS----- 
+0.05 => float fGain; 
+StkInstrument f_osc[4];                             //oscillators 
+Rhodey inst0 @=> f_osc[0] => dac;
+Rhodey inst1 @=> f_osc[1] => dac;
+HevyMetl inst2 @=> f_osc[2] => dac;
+HevyMetl inst3 @=> f_osc[3] => dac;
+
+/*for (0 => int i; i < f_osc.cap(); i++){ 
+    f_osc[i] => dac;                         //connect each to DAC 
+}*/
+
+//-----ACCEL-----
+Moog a_inst[3];                             // instruments for accel
+for (0 => int i; i < a_inst.cap(); i++){ 
+    a_inst[i] => dac;                       
+}
+Saxofony a_inst2[3];                            
+for (0 => int i; i < a_inst2.cap(); i++){ 
+    a_inst2[i] => dac;                 
 }
 
-0.1 => float aGain; //volume 
-Saxofony a_osc[3]; // oscillators for accel
-for (0 => int i; i < a_osc.cap(); i++){ 
-    a_osc[i] => dac; //connect each to DAC
-} 
-
-//===============Infinite Loop =======================================================
-while (true){
-    cereal.onInts(15) => now; //reading of current line 
-    cereal.getInts() @=>  int line[]; //cast reading to variable
-    
-    <<<line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14] >>>;    
-    line[0] => int check;
-    line[1] => int f1; //for readability 
-    line[2] => int v1;
-    line[3] => int f2;
-    line[4] => int v2;
-    line[5] => int f3;
-    line[6] => int v3;
-    line[7] => int f4;
-    line[8] => int v4;
-    line[9] => int a1;
-    line[10] => int a2;
-    line[11] => int a3;
-    line[12] => int av1;
-    line[13] => int av2;
-    line[14] => int av3;
-   
-    //[f1, f2, f3, f4] @=> int f[]; //flex values array  
-    //[v1, v2, v3, f4] @=> int v[]; //finger velocities array 
-    //[a1,a2,a3] @=> int a[]; //acceleration array
-    //[av1,av2,av3] @=> int av[]; //velocity of acceleration array 
-
-    fingerScream(f1, f2, f3, f4);
-    accelSwoosh(a1, a2, a3, av1, av2, av3);
-    
-    10::ms => now;
-}
-
+//-----ORIENT-----
+int oldOrient; //intialize previous value 
+SndBuf orientChangeDAC => ADSR e => dac;
+e.set(1:: second, 0.1::second, 0.5, 0.1::second);
+path + "Casio-VZ-10M-Bright-Phaze-C4" + ".wav" => orientChangeDAC.read;
 //=======================FUNCTIONS ==================================================
 //--------Fingers Fuction ----------------------------------------------------
 //PICK DESIRED EFFECT 
@@ -85,31 +75,75 @@ fun void fingerScream(int f1, int f2, int f3, int f4){
             else if (type == "smooth"){          // smooth effect
                  f[i]*2 => f_osc[i].freq;
             }
-            //1 => f_osc[i].noteOn;   //COMMENT FOR SINOSC   
-            fGain => f_osc[i].gain; //switch on all oscillators  
+            1 => f_osc[i].noteOn;             //COMMENT FOR SINOSC   
+            fGain => f_osc[i].gain;             //switch on all oscillators  
         }
         else{
             0 => f_osc[i].gain; 
-            //1 => f_osc[i].noteOff; //COMMENT FOR SINOSC
+            1 => f_osc[i].noteOff;            //COMMENT FOR SINOSC
         } 
     }
 }  
 
 //-----------Accel Function ----------------------------------------------------
-fun void accelSwoosh(int a1, int a2, int a3, int av1, int av2, int av3){
+fun void accelTwitch(int a1, int a2, int a3, int av1, int av2, int av3){
     [a1,a2,a3] @=> int a[]; //acceleration array 
     [av1,av2,av3] @=> int av[]; //velo of accel array 
     for (0 => int i; i < a.cap(); i++){
         //a_osc[i].Delay(10);
         if (Std.abs(av[i]) > 0){ //if we sense a change in position 
-            Std.mtof(aTune(Std.abs(a[i]))) => a_osc[i].freq;
-            aGain => a_osc[i].gain;
-            1 => a_osc[i].noteOn;
+            Std.mtof(aTune(Std.abs(a[i]))) => a_inst[i].freq;
+            .20 => a_inst[i].gain;
+            1 => a_inst[i].noteOn;
+            .04 => a_inst2[i].gain;
+            1 => a_inst2[i].noteOn;
         }
         else{
-            1 => a_osc[i].noteOff;
-            0 => a_osc[i].gain;
+            1 => a_inst[i].noteOff; 
+            0 => a_inst[i].gain; 
+            1 => a_inst2[i].noteOff;
+            0 => a_inst2[i].gain;
         }
+    }
+}
+
+fun void orientChange(int orient){
+    .04 => orientChangeDAC.gain;
+    orient => float oriFloat; 
+
+    if (orient != oldOrient){ //if we detect a change in orientation 
+        0 => orientChangeDAC.pos; //play the sound from beginning
+        1 => e.keyOn;
+        
+        /*if (orient == 0){ //choose synth rate (note) 
+            orient+1 => orientChangeDAC.rate;   
+        }
+        else if (orient == 1){ 
+            orient+1 => orientChangeDAC.rate;
+        }
+        else if (orient == 2){
+            orient+1 => orientChangeDAC.rate;
+        }
+        else if (orient == 3){
+            orient+1 => orientChangeDAC.rate;
+        }
+        else if (orient == 4){
+            orient+1 => orientChangeDAC.rate;
+        }*/
+        //(oriFloat+1)/4 => orientChangeDAC.rate;
+    }
+    orient => oldOrient; //reset
+}
+
+//DOES NOT WORK...
+fun void accelSwoosh(int av1, int av2, int av3){
+    10 => int threshold;
+    SndBuf accelSwooshDAC => dac;
+    me.dir() + "/soundFiles/snare_01.wav" => accelSwooshDAC.read; // dir + sound file we want to play
+    if  (av1 > threshold || av2 > threshold || av3 > threshold){  //if we detect a pulse 
+        .1 => accelSwooshDAC.gain; //play the note 
+        0 => accelSwooshDAC.pos; // from beginning 
+        //10::ms => now; 
     }
 }
 
@@ -126,4 +160,41 @@ fun int aTune(int rawNote){
         rawNote => aTuneNote; //keep if in key 
     }
     return aTuneNote; 
+}
+
+//===============Infinite Loop =======================================================
+while (true){
+    cereal.onInts(16) => now; //reading of current line 
+    cereal.getInts() @=>  int line[]; //cast reading to variable
+    
+    <<<line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14], line[15] >>>;    
+    line[0] => int check;
+    line[1] => int f1; //for readability 
+    line[2] => int v1;
+    line[3] => int f2;
+    line[4] => int v2;
+    line[5] => int f3;
+    line[6] => int v3;
+    line[7] => int f4;
+    line[8] => int v4;
+    line[9] => int a1;
+    line[10] => int a2;
+    line[11] => int a3;
+    line[12] => int av1;
+    line[13] => int av2;
+    line[14] => int av3;
+    line[15] => int orient;
+   
+    //[f1, f2, f3, f4] @=> int f[]; //flex values array  
+    //[v1, v2, v3, f4] @=> int v[]; //finger velocities array 
+    //[a1,a2,a3] @=> int a[]; //acceleration array
+    //[av1,av2,av3] @=> int av[]; //velocity of acceleration array 
+
+    fingerScream(f1, f2, f3, f4);
+    accelTwitch(a1, a2, a3, av1, av2, av3);
+    //orientChange(orient);
+    
+    //accelSwoosh(av1, av2, av3); DOES NOT WORK 
+    
+    10::ms => now;
 }
