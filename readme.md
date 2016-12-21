@@ -9,16 +9,16 @@ I’ve separated Insula into two components: biological (v1), and tactile (v2). 
 ##Hardware Overview:
 ###**Microcontroller:** [Arduino Nano] (https://www.arduino.cc/en/Main/ArduinoBoardNano)
 ###**Sensors: Insula V1**
-1. Heart-rate monitor: [Pulse Sensor] (http://pulsesensor.com/)
+1. **Heart-rate monitor:** [Pulse Sensor] (http://pulsesensor.com/)
 
 2. **Electromyogram:** [MyoWare] (http://www.advancertechnologies.com/p/myoware.html)
 
 3. **Breath Rate Monitor:** Our design. It consists of a [conducitve rubber resistor] https://www.adafruit.com/products/519) in line with a resistor to create a voltage divider. Data is good, but needs to be cleaned via Arduino, and processed to spit out a boolean based on inhale/exhale. 
 
 ###Sensors: Insula V2
-1. **[Flex Sensors]** (https://www.adafruit.com/products/1070) on each finger 
+1. **[Flex Sensors] (https://www.adafruit.com/products/1070)** on each finger 
 
-2. **[Accelerometer]** (https://learn.sparkfun.com/tutorials/mma8452q-accelerometer-breakout-hookup-guide)
+2. **[Accelerometer] (https://learn.sparkfun.com/tutorials/mma8452q-accelerometer-breakout-hookup-guide)**
 
 ###Schematic: 
 The circuit is pretty straight forward, as most of the sensors are plug and play (voltage, ground, and analog out). The Arduino Nano allows for 8 analog inputs, so after accounting for the flex sensors and accelerometer you can add in two additional sensors from V1. I think EMG and breath rate sound best. Just make sure to adjust the arduino code to print the correct values to serial. If you are using a different arduino, be cautious of lining up SDA and SCL communication pins correctly. See the arduino site for specifications for your board. 
