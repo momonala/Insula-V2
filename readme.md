@@ -13,10 +13,10 @@ I’ve separated Insula into two components: biological (v1), and tactile (v2). 
 
 2. **Electromyogram:** [MyoWare] (http://www.advancertechnologies.com/p/myoware.html)
 
-3. **Breath Rate Monitor:** Our design. It consists of a [conducitve rubber resistor] https://www.adafruit.com/products/519) in line with a resistor to create a voltage divider. Data is good, but needs to be cleaned via Arduino, and processed to spit out a boolean based on inhale/exhale. 
+3. **Breath Rate Monitor:** Our design. It consists of a [conducitve rubber resistor] (https://www.adafruit.com/products/519) in line with a resistor to create a voltage divider. Optional capacitor across the sensor as an RC filter to tease out noise. Data is good, but needs to be cleaned via Arduino, and processed to spit out a boolean based on inhale/exhale. 
 
 ###Sensors: Insula V2
-1. **[Flex Sensors] (https://www.adafruit.com/products/1070)** on each finger 
+1. **[Flex Sensors] (https://www.adafruit.com/products/1070)** on each finger, in line with a voltage divider. Optional capacitor across the sensor as an RC filter to tease out noise. 
 
 2. **[Accelerometer] (https://learn.sparkfun.com/tutorials/mma8452q-accelerometer-breakout-hookup-guide)**
 
@@ -37,7 +37,7 @@ A quick python script is used to record data and save as a .csv. This can be use
 
 Data is fed in from the Arduino through Serial, and into ChucK. Sound files are triggered for some events (heart rate, breath), and parameters of sound oscillators are controlled for the flex sensors, acclerometer, and muscles. 
 
-I am hoping to integrate a Processing GUI, so that users can select notes and instruments and a Processing visualizer, probably using a OpenSoundControl setup. 
+I am hoping to integrate a Processing GUI, so that users can select notes and instruments and a Processing visualizer, probably using an OpenSoundControl setup. 
 
 ##Conclusion: 
 The name Insula comes from the insular cortex of the brain, which is responsible for helping us recognize our own biology. Your insula is what allows you to feel your heartbeat echo through your body when you’re excited, and what makes your feel thirsty after a long run. And that’s why Insula was built: as an avenue to recognize, respond to, and think more creatively and holistically about our own biology.
