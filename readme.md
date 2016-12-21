@@ -23,7 +23,7 @@ I’ve separated Insula into two components: biological (v1), and tactile (v2). 
 ###Schematic: 
 The circuit is pretty straight forward, as most of the sensors are plug and play (voltage, ground, and analog out). The Arduino Nano allows for 8 analog inputs, so after accounting for the flex sensors and accelerometer you can add in two additional sensors from V1. I think EMG and breath rate sound best. Just make sure to adjust the arduino code to print the correct values to serial. If you are using a different arduino, be cautious of lining up SDA and SCL communication pins correctly. See the arduino site for specifications for your board. 
 
-(https://drive.google.com/open?id=0B-Kp5PAG6589dUE0WUJLV184NlE)
+![](https://drive.google.com/open?id=0B-Kp5PAG6589dUE0WUJLV184NlE)
 
 ##Software Overview: 
 ###Arduino: 
