@@ -31,27 +31,23 @@ SndBuf startup => dac; //startup sound :)
 //0 => startup.pos;
 
 //--------Intialize Oscillators ----------------------------------------------------
-//STKinstruments: Clarinet, BlowBotl, Flute, Saxofony, Brass, ModalBar, BandedWG, Moog
+//STKinstruments: BlowBotl, Flute, Saxofony, Brass, ModalBar, BandedWG, Moog, Rhodey 
 //-----FINGERS----- 
-0.05 => float fGain; 
-StkInstrument f_osc[4];                             //oscillators 
-Rhodey inst0 @=> f_osc[0] => dac;
-Rhodey inst1 @=> f_osc[1] => dac;
-HevyMetl inst2 @=> f_osc[2] => dac;
-HevyMetl inst3 @=> f_osc[3] => dac;
-
-/*for (0 => int i; i < f_osc.cap(); i++){ 
-    f_osc[i] => dac;                         //connect each to DAC 
-}*/
+0.07 => float fGain; 
+StkInstrument f_osc[4];                          //oscillators 
+Rhodey inst0 @=> f_osc[0] => NRev fRev0 => dac;
+HevyMetl inst1 @=> f_osc[1] => NRev fRev1 => dac;
+Flute inst2 @=> f_osc[2] => NRev fRev2 => dac;
+Flute inst3 @=> f_osc[3] => NRev fRev3 => dac;
+0.35 => fRev0.mix => fRev1.mix => fRev2.mix => fRev3.mix; //set reverb/dry mixture  
 
 //-----ACCEL-----
-Moog a_inst[3];                             // instruments for accel
+0.07 => float aGain; 
+1 => int accelThreshold;        //which accelVel must cross to register sound 
+SinOsc a_inst[3];                             // instruments for accel
 for (0 => int i; i < a_inst.cap(); i++){ 
-    a_inst[i] => dac;                       
-}
-Saxofony a_inst2[3];                            
-for (0 => int i; i < a_inst2.cap(); i++){ 
-    a_inst2[i] => dac;                 
+    a_inst[i] => NRev aRev => dac;            //to DAC with reverb                                   
+    0.3 => aRev.mix;
 }
 
 //-----ORIENT-----
@@ -59,6 +55,7 @@ int oldOrient; //intialize previous value
 SndBuf orientChangeDAC => ADSR e => dac;
 e.set(1:: second, 0.1::second, 0.5, 0.1::second);
 path + "Casio-VZ-10M-Bright-Phaze-C4" + ".wav" => orientChangeDAC.read;
+.04 => orientChangeDAC.gain;
 //=======================FUNCTIONS ==================================================
 //--------Fingers Fuction ----------------------------------------------------
 //PICK DESIRED EFFECT 
@@ -91,24 +88,20 @@ fun void accelTwitch(int a1, int a2, int a3, int av1, int av2, int av3){
     [av1,av2,av3] @=> int av[]; //velo of accel array 
     for (0 => int i; i < a.cap(); i++){
         //a_osc[i].Delay(10);
-        if (Std.abs(av[i]) > 0){ //if we sense a change in position 
+        if (Std.abs(av[0]) > accelThreshold || Std.abs(av[1]) > accelThreshold || Std.abs(av[2]) > accelThreshold){ //if we sense a change in position 
             Std.mtof(aTune(Std.abs(a[i]))) => a_inst[i].freq;
-            .20 => a_inst[i].gain;
-            1 => a_inst[i].noteOn;
-            .04 => a_inst2[i].gain;
-            1 => a_inst2[i].noteOn;
+            aGain => a_inst[i].gain;
+            //1 => a_inst[i].noteOn;
         }
-        else{
-            1 => a_inst[i].noteOff; 
-            0 => a_inst[i].gain; 
-            1 => a_inst2[i].noteOff;
-            0 => a_inst2[i].gain;
+        else{ 
+            0 => a_inst[i].gain;
+           // 1 => a_inst[i].noteOff; 
         }
     }
 }
 
 fun void orientChange(int orient){
-    .04 => orientChangeDAC.gain;
+    
     orient => float oriFloat; 
 
     if (orient != oldOrient){ //if we detect a change in orientation 
@@ -167,7 +160,7 @@ while (true){
     cereal.onInts(16) => now; //reading of current line 
     cereal.getInts() @=>  int line[]; //cast reading to variable
     
-    <<<line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14], line[15] >>>;    
+    //<<<line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14], line[15] >>>;    
     line[0] => int check;
     line[1] => int f1; //for readability 
     line[2] => int v1;
@@ -193,7 +186,6 @@ while (true){
     fingerScream(f1, f2, f3, f4);
     accelTwitch(a1, a2, a3, av1, av2, av3);
     //orientChange(orient);
-    
     //accelSwoosh(av1, av2, av3); DOES NOT WORK 
     
     10::ms => now;

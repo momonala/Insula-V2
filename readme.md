@@ -4,7 +4,7 @@ Insula is a wearable device that translates physiological events from sensor dat
 The goal of Insula is to make biodata interesting, meaningful and useful to a diverse set of users. Our technology allows users to become mindful of the processes in their bodies through the universal medium of music. We have created all custom hardware and software for the device, building on platforms including Arduino, ChucK, OpenBCI and Processing. 
 
 I’ve separated Insula into two components: biological (v1), and tactile (v2). V1 consists of the electrocardiogram, electromyogram, and breath rate sensors, all of which were part of the [original thesis project] (https://drive.google.com/open?id=0B-Kp5PAG6589emdFNExwUmRqOG8)
- that started Insula. V2 is a new component that introduces flex sensors on each finger and an accelerometer for more intentional control of the music. EEG processing, which ran on OpenBCI cannot be found here, but it was part of the original V1. Message me if you’re interested on that. I've redesigned Insula with modularity in mind, so sensors can be added in or removed based on the user's preference. 
+ that started Insula. V2 is a new component that introduces flex sensors on each finger and an accelerometer for more intentional control of the music. EEG processing, which ran on OpenBCI cannot be found here, but it was part of the original V1. Message me if you’re interested on that. I've redesigned Insula with modularity in mind, so sensors can be added in or removed based on the user's preference. I still need to update the ChucK code for modularity, though... 
  
 ##Hardware Overview:
 ###**Microcontroller:** [Arduino Nano] (https://www.arduino.cc/en/Main/ArduinoBoardNano)
@@ -20,6 +20,9 @@ I’ve separated Insula into two components: biological (v1), and tactile (v2). 
 
 2. **[Accelerometer] (https://learn.sparkfun.com/tutorials/mma8452q-accelerometer-breakout-hookup-guide)**
 
+###Bluetooth 
+A  [Wireless Bluetooth Transceiver] (https://www.amazon.com/gp/product/B0093XAV4U/ref=ya_st_dp_summary) is hooked up to the TX/RX pins of the Arduino and provides Serial communication to the laptop where ChucK lives. 
+
 ###Schematic: 
 The circuit is pretty straight forward, as most of the sensors are plug and play (voltage, ground, and analog out). The Arduino Nano allows for 8 analog inputs, so after accounting for the flex sensors and accelerometer you can add in two additional sensors from V1. I think EMG and breath rate sound best. Just make sure to adjust the arduino code to print the correct values to serial. If you are using a different arduino, be cautious of lining up SDA and SCL communication pins correctly. See the arduino site for specifications for your board. 
 
@@ -30,7 +33,7 @@ The circuit is pretty straight forward, as most of the sensors are plug and play
 Each sensor feeds data into analog inputs on the Arduino, and smoothing/signal processing algorithms, and rate-of-change algorithms are applied as need be. Each sensor can be turned on or off by boolean controls at the top of the main sketch. Insula V1 sensors are also modular with V2. 
 
 ###ChucK 
-[ChucK] (http://chuck.cs.princeton.edu/) is a  programming language for real-time sound synthesis and music creation. I chose ChucK because you can easily gernaete Ugens, MIDI, and sound oscilattors, it is cross-platform (most DAWs aren't as Windows friendly), and it allows for super quick experimentation. A few cons are that it is syntactically confusing (similar to C++ with stupid anomolies), it has a poor user community, and it is not well documented. 
+[ChucK] (http://chuck.cs.princeton.edu/) is a  programming language for real-time sound synthesis and music creation. I chose ChucK because you can easily gernaete Ugens, MIDI, and sound oscilators, it is cross-platform, and it allows for super quick experimentation. A few cons are that it is syntactically confusing (similar to C++ with stupid anomolies), it has a poor user community, and it is not well documented. 
 
 ###Python 
 A quick python script is used to record data and save as a .csv. This can be used for graphing in Excel for testing, or you can optimize the file for ChucK, so you can experiment with creating music without needing the hardware on you (wires and circuits can be a bit off putting in the wrong circles of coffee shops). 
