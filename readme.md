@@ -35,7 +35,7 @@ The circuit is pretty straight forward, as most of the sensors are plug and play
 Each sensor feeds data into analog inputs on the Arduino, and smoothing/signal processing algorithms, and rate-of-change algorithms are applied as need be. Each sensor can be turned on or off by boolean controls at the top of the main sketch. Insula V1 sensors are also modular with V2. 
 
 ###ChucK 
-[ChucK] (http://chuck.cs.princeton.edu/) is a  programming language for real-time sound synthesis and music creation. I chose ChucK because you can easily generate Ugens, MIDI, and sound oscillators, it is cross-platform, and it allows for super quick experimentation. A few cons are that it is syntactically confusing (similar to C with stupid anomalies), it has a poor user community, and it is not well documented. 
+[ChucK] (http://chuck.cs.princeton.edu/) is a  programming language for real-time sound synthesis and music creation. I chose ChucK because you can easily generate Ugens, MIDI, and sound oscillators, it is cross-platform, and it allows for super quick experimentation. A few cons are that it is syntactically confusing (similar to C with stupid anomalies) and it is not well documented. 
 
 ###Python 
 A quick python script is used to record data and save as a .csv. This can be used for graphing in Excel for testing, or you can optimize the file for ChucK, so you can experiment with creating music without needing the hardware on you (wires and circuits can be a bit off putting in the wrong circles of coffee shops). 
