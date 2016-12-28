@@ -1,4 +1,7 @@
 #Insula 
+
+https://www.youtube.com/watch?v=Azrm98Bf4nk
+
 Insula is a wearable device that translates physiological events from sensor data (EEG, ECG, EMG, breath rate, hand gestures) into music in real-time. A heart beat turns into a drum beat, the rise and fall of a breath turns into the tension and release of a chord progression, etc. Here you can find the code that runs under the hood. 
 
 The goal of Insula is to make biodata interesting, meaningful and useful to a diverse set of users. This technology allows users to become mindful of the processes in their bodies through the universal medium of music. I have created all custom hardware and software for the device, building on platforms including Arduino, ChucK, OpenBCI and Processing. 

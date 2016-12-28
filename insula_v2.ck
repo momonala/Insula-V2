@@ -31,53 +31,91 @@ SndBuf startup => dac; //startup sound :)
 //0 => startup.pos;
 
 //--------Intialize Oscillators ----------------------------------------------------
-//STKinstruments: BlowBotl, Flute, Saxofony, Brass, ModalBar, BandedWG, Moog, Rhodey 
+//STKinstruments: BlowBotl, Saxofony, Brass, ModalBar, BandedWG, Moog, Rhodey. HevyMetl 
 //-----FINGERS----- 
-0.07 => float fGain; 
-StkInstrument f_osc[4];                          //oscillators 
-Rhodey inst0 @=> f_osc[0] => NRev fRev0 => dac;
-HevyMetl inst1 @=> f_osc[1] => NRev fRev1 => dac;
-Flute inst2 @=> f_osc[2] => NRev fRev2 => dac;
-Flute inst3 @=> f_osc[3] => NRev fRev3 => dac;
-0.35 => fRev0.mix => fRev1.mix => fRev2.mix => fRev3.mix; //set reverb/dry mixture  
+0.005 => float fGain; 
+10 => int fThresh; 
+NRev fRev; 
+0.2 => fRev.mix;
+true => int orientOn; //turn on/off orientation detector on fingers 
+
+StkInstrument f_osc[4];
+//oscillators for orient off feature
+//you can select an STKinst for each finger, it will not change with orient 
+Rhodey inst0 @=> f_osc[0] => fRev => dac;
+Rhodey inst1 @=> f_osc[1] => fRev => dac;
+Rhodey inst2 @=> f_osc[2] => fRev => dac;
+Rhodey inst3 @=> f_osc[3] => fRev => dac;
+
+//oscillator array for each orientation 
+//same inst on each finger, will change with orientation
+HevyMetl f_osc0[4]; 	//fingers up
+Rhodey f_osc1[4];       //fingers down
+Saxofony f_osc2[4];     //palm left
+ModalBar f_osc3[4];     //palm right 
+BlowBotl f_osc4[4];     //palm down
+
+for (0 => int i; i < 4; i++){ 
+    f_osc0[i] => fRev => dac; //connect each to DAC, with reverb
+    f_osc1[i] => fRev => dac;        
+    f_osc2[i] => fRev => dac;
+    f_osc3[i] => fRev => dac;
+    f_osc4[i] => fRev => dac;
+    
+}
 
 //-----ACCEL-----
-0.07 => float aGain; 
-1 => int accelThreshold;        //which accelVel must cross to register sound 
+0.2 => float aGain; 
+1 => int accelThreshold;        //thresh accelVel must cross to register sound 
 SinOsc a_inst[3];                             // instruments for accel
 for (0 => int i; i < a_inst.cap(); i++){ 
     a_inst[i] => NRev aRev => dac;            //to DAC with reverb                                   
-    0.3 => aRev.mix;
+    0.2 => aRev.mix;
 }
 
-//-----ORIENT-----
-int oldOrient; //intialize previous value 
-SndBuf orientChangeDAC => ADSR e => dac;
-e.set(1:: second, 0.1::second, 0.5, 0.1::second);
-path + "Casio-VZ-10M-Bright-Phaze-C4" + ".wav" => orientChangeDAC.read;
-.04 => orientChangeDAC.gain;
 //=======================FUNCTIONS ==================================================
 //--------Fingers Fuction ----------------------------------------------------
-//PICK DESIRED EFFECT 
-"click" => string type;
-//"smooth" => string type;
-
-fun void fingerScream(int f1, int f2, int f3, int f4){
+fun void fingerScream(int f1, int f2, int f3, int f4, int orient){
     [f1, f2, f3, f4] @=> int f[]; //flex values array 
     for (0 => int i; i < f_osc.cap(); i++){
-        if (f[i] > 25){
-            if (type == "click"){               //clicky effect 
+        if (f[i] > fThresh){            //thresh avoid constant low freq's     
+            if (orientOn == true){
+                if (orient == 0){
+                    Std.mtof(aTune(f[i])) => f_osc0[i].freq;
+                    1 => f_osc0[i].noteOn; 
+                    fGain => f_osc0[i].gain;
+                }
+                else if (orient == 1){ 
+                    Std.mtof(aTune(f[i])) => f_osc1[i].freq;
+                    1 => f_osc1[i].noteOn;
+                    fGain => f_osc1[i].gain;
+                }
+                else if (orient == 2){ 
+                    Std.mtof(aTune(f[i])) => f_osc2[i].freq;
+                    1 => f_osc2[i].noteOn;
+                    fGain => f_osc2[i].gain;
+                }
+                else if (orient == 3){
+                    Std.mtof(aTune(f[i])) => f_osc3[i].freq;
+                    1 => f_osc3[i].noteOn;
+                    fGain => f_osc3[i].gain;
+                }
+                else if (orient == 4){
+                    Std.mtof(aTune(f[i])) => f_osc4[i].freq;
+                    1 => f_osc4[i].noteOn;
+                    fGain => f_osc4[i].gain;
+                }
+            }
+            else if(orientOn == false){ 
                 Std.mtof(aTune(f[i])) => f_osc[i].freq; //autotune, convert midi to freq
-            }
-            else if (type == "smooth"){          // smooth effect
-                 f[i]*2 => f_osc[i].freq;
-            }
-            1 => f_osc[i].noteOn;             //COMMENT FOR SINOSC   
-            fGain => f_osc[i].gain;             //switch on all oscillators  
+                1 => f_osc[i].noteOn;             //COMMENT FOR SINOSC   
+                fGain => f_osc[i].gain;           //switch on all oscillators 
+            }       
+             
         }
-        else{
-            0 => f_osc[i].gain; 
-            1 => f_osc[i].noteOff;            //COMMENT FOR SINOSC
+        else{ //if thresh not reached, turn osc's off 
+            0 => f_osc0[i].gain => f_osc1[i].gain => f_osc2[i].gain => f_osc3[i].gain => f_osc4[i].gain; 
+            1 =>  f_osc0[i].noteOff => f_osc1[i].noteOff => f_osc2[i].noteOff => f_osc3[i].noteOff => f_osc4[i].noteOff;         //COMMENT FOR SINOSC
         } 
     }
 }  
@@ -87,7 +125,6 @@ fun void accelTwitch(int a1, int a2, int a3, int av1, int av2, int av3){
     [a1,a2,a3] @=> int a[]; //acceleration array 
     [av1,av2,av3] @=> int av[]; //velo of accel array 
     for (0 => int i; i < a.cap(); i++){
-        //a_osc[i].Delay(10);
         if (Std.abs(av[0]) > accelThreshold || Std.abs(av[1]) > accelThreshold || Std.abs(av[2]) > accelThreshold){ //if we sense a change in position 
             Std.mtof(aTune(Std.abs(a[i]))) => a_inst[i].freq;
             aGain => a_inst[i].gain;
@@ -97,46 +134,6 @@ fun void accelTwitch(int a1, int a2, int a3, int av1, int av2, int av3){
             0 => a_inst[i].gain;
            // 1 => a_inst[i].noteOff; 
         }
-    }
-}
-
-fun void orientChange(int orient){
-    
-    orient => float oriFloat; 
-
-    if (orient != oldOrient){ //if we detect a change in orientation 
-        0 => orientChangeDAC.pos; //play the sound from beginning
-        1 => e.keyOn;
-        
-        /*if (orient == 0){ //choose synth rate (note) 
-            orient+1 => orientChangeDAC.rate;   
-        }
-        else if (orient == 1){ 
-            orient+1 => orientChangeDAC.rate;
-        }
-        else if (orient == 2){
-            orient+1 => orientChangeDAC.rate;
-        }
-        else if (orient == 3){
-            orient+1 => orientChangeDAC.rate;
-        }
-        else if (orient == 4){
-            orient+1 => orientChangeDAC.rate;
-        }*/
-        //(oriFloat+1)/4 => orientChangeDAC.rate;
-    }
-    orient => oldOrient; //reset
-}
-
-//DOES NOT WORK...
-fun void accelSwoosh(int av1, int av2, int av3){
-    10 => int threshold;
-    SndBuf accelSwooshDAC => dac;
-    me.dir() + "/soundFiles/snare_01.wav" => accelSwooshDAC.read; // dir + sound file we want to play
-    if  (av1 > threshold || av2 > threshold || av3 > threshold){  //if we detect a pulse 
-        .1 => accelSwooshDAC.gain; //play the note 
-        0 => accelSwooshDAC.pos; // from beginning 
-        //10::ms => now; 
     }
 }
 
@@ -183,10 +180,8 @@ while (true){
     //[a1,a2,a3] @=> int a[]; //acceleration array
     //[av1,av2,av3] @=> int av[]; //velocity of acceleration array 
 
-    fingerScream(f1, f2, f3, f4);
     accelTwitch(a1, a2, a3, av1, av2, av3);
-    //orientChange(orient);
-    //accelSwoosh(av1, av2, av3); DOES NOT WORK 
+    fingerScream(f1, f2, f3, f4, orient);
     
     10::ms => now;
 }
