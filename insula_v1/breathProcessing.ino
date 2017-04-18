@@ -1,17 +1,16 @@
 //Smoothing Function for Breath Rate: inhale (1) vs exhale (0)
-
-//---------------------------BREATH RATE GLOBAL VARIABLES ---------------------
-const int numReadingsBreath = 17;                  // number of samples to average over. Magnitude inversley correlated to processing speed. 
+//--------------------------- BREATH RATE GLOBAL VARIABLES ---------------------
+const int numReadingsBreath = 40;                  // number of samples to average over. Magnitude inversley correlated to processing speed. 
 const float arraySize =  float(numReadingsBreath);   //float for more percise division 
 float inputPinBreath = A1;
-const float slopeThreshold = 0.1176;            //slope detection (divisible by numReadingsBreath)
+const float slopeThreshold = 0.10;            //slope detection (divisible by numReadingsBreath)
 
 float readingsBreath[numReadingsBreath];        // the readings from the analog input
 int readIndexBreath = 0;                       // the index of the current reading
 float totalBreath = 0.0;                        // the running total
 float averageBreath = 0.0;                     // the average
 float slopeBreath = 0.0;
-boolean  breathOutput = false;
+int  breathOutput = 0;
 
 //------------------------------setup ------------------------------------------
 void setup_breath(){
@@ -53,13 +52,13 @@ void breath_processing(){
   }
 
   averageBreath = totalBreath / arraySize;            // calculate the average:
-  //Serial.println(averageBreath);                         // get breath rate curve for troubleshooting/plotting
+  //Serial.println(averageBreath);                    // get breath rate curve for troubleshooting/plotting
 
-  if (slopeBreath >= slopeThreshold) {                              // boolean of inhale (1)
-     breathOutput = true;                                  //if slope is between -0.1 & 0.1 (high noise) just keep old value 
+  if (slopeBreath >= slopeThreshold) {                // boolean of inhale (1)
+     breathOutput = 0;                                //if slope is between -0.1 & 0.1 (high noise) just keep old value 
   }
-  else if (slopeBreath<= -1*slopeThreshold){                              // boolean of exhale (0)
-      breathOutput = false;
+  else if (slopeBreath <= -1*slopeThreshold){         // boolean of exhale (0)
+      breathOutput = 1;
   } 
   else {
     breathOutput = breathOutput;

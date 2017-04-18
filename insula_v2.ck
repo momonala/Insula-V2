@@ -7,7 +7,7 @@ for (int i; i<list.size(); i++){
 }
 
 SerialIO cereal; // instance of serial IO to communicate 
-cereal.open(0, SerialIO.B115200, SerialIO.ASCII); //open port [port# from list, baud, ASCII or BINARY]
+cereal.open(2, SerialIO.B115200, SerialIO.ASCII); //open port [port# from list, baud, ASCII or BINARY]
 //make sure serial is reading at right positions in array
 //read a few lines, check to see if "100" marker is at right position
 //blackhole if not
@@ -36,16 +36,16 @@ SndBuf startup => dac; //startup sound :)
 0.005 => float fGain; 
 10 => int fThresh; 
 NRev fRev; 
-0.2 => fRev.mix;
-true => int orientOn; //turn on/off orientation detector on fingers 
+0.10 => fRev.mix;
+0 => int orientOn; //turn on/off orientation detector on fingers 
 
 StkInstrument f_osc[4];
 //oscillators for orient off feature
 //you can select an STKinst for each finger, it will not change with orient 
-Rhodey inst0 @=> f_osc[0] => fRev => dac;
+HevyMetl inst0 @=> f_osc[0] => fRev => dac;
 Rhodey inst1 @=> f_osc[1] => fRev => dac;
-Rhodey inst2 @=> f_osc[2] => fRev => dac;
-Rhodey inst3 @=> f_osc[3] => fRev => dac;
+Saxofony inst2 @=> f_osc[2] => fRev => dac;
+Flute inst3 @=> f_osc[3] => fRev => dac;
 
 //oscillator array for each orientation 
 //same inst on each finger, will change with orientation
@@ -157,7 +157,7 @@ while (true){
     cereal.onInts(16) => now; //reading of current line 
     cereal.getInts() @=>  int line[]; //cast reading to variable
     
-    //<<<line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14], line[15] >>>;    
+    <<<line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14], line[15] >>>;    
     line[0] => int check;
     line[1] => int f1; //for readability 
     line[2] => int v1;

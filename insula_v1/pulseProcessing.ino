@@ -1,4 +1,4 @@
-int pulsePin = 0;
+int pulsePin = A0;
 //-----------------------SIGNAL PROCESS VARIABLES --------------------------------------
 int BPM;
 int Signal;                // raw data

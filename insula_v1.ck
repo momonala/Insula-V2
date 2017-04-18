@@ -7,7 +7,7 @@ for (int i; i<list.size(); i++){
 }
 
 SerialIO cereal; // instance of serial IO to communicate 
-cereal.open(0, SerialIO.B115200, SerialIO.ASCII); //open port [port# from list, baud, ASCII or BINARY]
+cereal.open(2, SerialIO.B115200, SerialIO.ASCII); //open port [port# from list, baud, ASCII or BINARY]
 //make sure serial is reading at right positions in array
 //read a few lines, check to see if "100" marker is at right position
 //blackhole if not
@@ -25,8 +25,8 @@ for (0 => int i; i < 5; i++){
 0.25 => float onGain; 
 me.dir() + "/soundFiles/" => string path;
 
-//SndBuf heartBeatDAC => dac;
-//path + "kick_01.wav" => heartBeatDAC.read; // dir + sound file we want to play
+SndBuf heartBeatDAC => dac;
+path + "kick_01.wav" => heartBeatDAC.read; // dir + sound file we want to play
 
 /*SndBuf inhaleDAC => dac;
 path + "minor.wav" => inhaleDAC.read; // dir + sound file we want to play
@@ -38,44 +38,14 @@ path + "major.wav" => exhaleDAC.read; // dir + sound file we want to play
 SinOsc inhale => dac;
 SinOsc exhale => dac;
 
-/*
-//fun void playBreath()
-
-fun void playPulse(int breathInput){
-    SndBuf heartBeatDAC => dac;
-    me.dir() + "/soundFiles/kick_01.wav" => heartBeatDAC.read; // dir + sound file we want to play
-    if  (breathInput == 1){   //if we detect a pulse 
+fun void playPulse(int pulse){
+   if  (pulse == 1){   //if we detect a pulse 
         onGain => heartBeatDAC.gain; //play the note 
         0 => heartBeatDAC.pos; // from beginning 
-        500::ms => now;
     }
 }
 
-spork ~ playPulse(int pulse);
-*/
-//===============Infinite Loop =======================================================
-while (true){
-    cereal.onInts(3) => now; //reading of current line 
-    cereal.getInts() @=>  int line[]; //cast reading to variable
-    line[0] => int check;
-    line[1] => int breath;
-    line[2] => int pulse; 
-    <<<breath, pulse>>>;
-    
-   /*if  (pulse == 1){   //if we detect a pulse 
-        onGain => heartBeatDAC.gain; //play the note 
-        0 => heartBeatDAC.pos; // from beginning 
-    }
-   
-    if  (breath == 1){   //if we detect a pulse 
-        onGain => inhaleDAC.gain; //play the note 
-        50000 => inhaleDAC.pos; // from beginning 
-    }
-    if  (breath == 0){   //if we detect a pulse 
-        onGain => exhaleDAC.gain; //play the note 
-        0 => exhaleDAC.pos; // from beginning 
-    }
-    */
+fun void playBreath (int breath){
     if  (breath == 1){   //if we detect a pulse 
         0 => exhale.gain;
         440 => inhale.freq ; // from beginning 
@@ -87,6 +57,18 @@ while (true){
        220 => exhale.freq; // from beginning
        onGain => exhale.gain; //play the note 
     }
+}
+//===============Infinite Loop =======================================================
+while (true){
+    cereal.onInts(3) => now; //reading of current line 
+    cereal.getInts() @=>  int line[]; //cast reading to variable
+    line[0] => int check;
+    line[1] => int breath;
+    line[2] => int pulse; 
+    <<<breath, pulse>>>;
+    
+    playBreath(breath);
+    playPulse(pulse);
     
     10::ms => now;
 }
