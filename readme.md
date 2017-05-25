@@ -12,8 +12,11 @@ that started Insula. V2 is a new component that introduces flex sensors on each 
 The basic control flow of data is as follows: Data is fed in from the Arduino through Serial, and into ChucK. Sound files are triggered for some events (heart rate, breath), and parameters of sound oscillators are controlled for the flex sensors, accelerometer, and muscles. 
  
 ## Hardware Overview:
-###**Microcontroller:** [Arduino Nano] (https://www.arduino.cc/en/Main/ArduinoBoardNano)
-###**Sensors: Insula V1**
+
+### **Microcontroller:** [Arduino Nano] (https://www.arduino.cc/en/Main/ArduinoBoardNano)
+
+### **Sensors: Insula V1**
+
 1. **Heart-rate monitor:** [Pulse Sensor] (http://pulsesensor.com/)
 
 2. **Electromyogram:** [MyoWare] (http://www.advancertechnologies.com/p/myoware.html)
