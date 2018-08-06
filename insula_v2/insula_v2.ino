@@ -13,12 +13,13 @@ bool accelOn = true;
 //============================SETUP==========================================
 void setup() {
   Serial.begin(115200);
-  gloveSetup(); 
+  gloveSetup();
   accelSetup();
+  Serial.print("end of setup");
 }
 
 //===============================LOOP=====================================
-void loop() {   
+void loop() {
   if (ChuckOn = true){
     Serial.print(100); //can use to check in ChucK
     Serial.print(",");

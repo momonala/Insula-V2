@@ -23,6 +23,7 @@ int orientation; //orientation from accelerometer
 //----------------------------------SIGNAL PROCESSING----------------------------------------
 void accelSetup(){
    accel.init();   // Default init. Set accelerometer with a full-scale range of +/-2g, and output data rate of 800 Hz 
+   Serial.print("could init accel");
    for (int thisReading = 0; thisReading < accelArraySize; thisReading++) {
     readingsX[thisReading] = 0; //intialzie readings in array to zero 
     readingsY[thisReading] = 0; 
